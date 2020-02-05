@@ -19,14 +19,14 @@ window.addEventListener('load', () => {
 
             fetch(API)
                 .then(response => response.json())
-                .then(data => {
-                    // console.log(data);
-                    const { temperature, summary, icon } = data.currently;
-                    temperatureDegree.textContent = Math.floor(temperature);
+                .then(async data => {
+                    const { temperature, summary, icon } = await data.currently;
+                    temperatureInFahrenheit = await temperature.toFixed(2);
+                    let temperatureInCelcius = await toCelcius(temperature);
+
+                    temperatureDegree.textContent = temperatureInCelcius;
                     temperatureDescription.textContent = summary;
                     locationTimezone.textContent = data.timezone;
-
-                    let temperatureInCelcius = Math.floor((temperature - 32) * (5 / 9));
 
                     setIcons(icon, document.querySelector('.icon'));
 
@@ -35,14 +35,12 @@ window.addEventListener('load', () => {
                             temperatureDegree.textContent = temperatureInCelcius;
                             temperatureSpan.textContent = 'C';
                         } else {
-                            temperatureDegree.textContent = temperature;
+                            temperatureDegree.textContent = temperatureInFahrenheit;
                             temperatureSpan.textContent = 'F';
                         }
                     });
                 });
         });
-    } else {
-        h1.textContent = 'Location not found.';
     }
 
     function setIcons(icon, iconID) {
@@ -50,5 +48,9 @@ window.addEventListener('load', () => {
         const currentIcon = icon.replace(/-/g, '_').toUpperCase();
         skycons.play();
         return skycons.set(iconID, Skycons[currentIcon]);
+    }
+
+    function toCelcius(temperatureInFahrenheit) {
+        return (((temperatureInFahrenheit - 32) * 5) / 9).toFixed(2);
     }
 });
